@@ -1,4 +1,4 @@
-package com.example.android.pets;
+package com.example.android.inventory;
 
 import android.content.ContentValues;
 import android.content.Intent;
@@ -14,18 +14,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.example.android.pets.data.PetContract.PetEntry;
-import com.example.android.pets.data.PetDbHelper;
+import com.example.android.inventory.data.InventoryContract;
+import com.example.android.inventory.data.InventoryContract.InventoryEntry;
+import com.example.android.inventory.data.InventoryDbHelper;
 
 /**
- * Displays list of pets that were entered and stored in the app.
+ * Displays list of products that were entered and stored in the app.
  */
 public class CatalogActivity extends AppCompatActivity {
 
     /**
      * Database helper that will provide us access to the database
      */
-    private PetDbHelper mDbHelper;
+    private InventoryDbHelper mDbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +45,7 @@ public class CatalogActivity extends AppCompatActivity {
 
         // To access our database, we instantiate our subclass of SQLiteOpenHelper
         // and pass the context, which is the current activity.
-        mDbHelper = new PetDbHelper(this);
+        mDbHelper = new InventoryDbHelper(this);
 
         displayDatabaseInfo();
 
@@ -59,7 +60,7 @@ public class CatalogActivity extends AppCompatActivity {
 
     /**
      * Temporary helper method to display information in the onscreen TextView about the state of
-     * the pets database.
+     * the inventory database.
      */
     private void displayDatabaseInfo() {
         // Create and/or open a database to read from it
@@ -67,15 +68,15 @@ public class CatalogActivity extends AppCompatActivity {
 
         String[] projection = {
                 BaseColumns._ID,
-                PetEntry.COLUMN_PET_NAME,
-                PetEntry.COLUMN_PET_BREED,
-                PetEntry.COLUMN_PET_WEIGHT,
-                PetEntry.COLUMN_PET_GENDER,
+                InventoryContract.InventoryEntry.COLUMN_PRODUCT_NAME,
+                InventoryContract.InventoryEntry.COLUMN_QUANTITY,
+                InventoryContract.InventoryEntry.COLUMN_SUPPLIER_NAME,
+                InventoryContract.InventoryEntry.COLUMN_PRICE,
         };
 
 
         Cursor cursor = db.query(
-                PetEntry.TABLE_NAME,
+                InventoryContract.InventoryEntry.TABLE_NAME,
                 projection,
                 null,
                 null,
@@ -84,37 +85,22 @@ public class CatalogActivity extends AppCompatActivity {
                 null
         );
 
-        TextView displayView = (TextView) findViewById(R.id.text_view_pet);
+        TextView displayView = (TextView) findViewById(R.id.text_view_inventory);
 
         try {
-            // Create a header in the Text View that looks like this:
-            //
-            // The pets table contains <number of rows in Cursor> pets.
-            // _id - name - breed - gender - weight
-            //
-            // In the while loop below, iterate through the rows of the cursor and display
-            // the information from each column in this order.
-//            displayView.setText("The pets table contains " + cursor.getCount() + " pets.\n\n");
-//            displayView.append("\n" +
-//                    cursor.getString(cursor.getColumnIndex(PetEntry._ID)) + "\t" +
-//                    cursor.getString(cursor.getColumnIndex(PetEntry.COLUMN_PET_NAME)) + "\t" +
-//                    cursor.getString(cursor.getColumnIndex(PetEntry.COLUMN_PET_BREED)) + "\t" +
-//                    cursor.getString(cursor.getColumnIndex(PetEntry.COLUMN_PET_GENDER)) + "\t" +
-//                    cursor.getString(cursor.getColumnIndex(PetEntry.COLUMN_PET_WEIGHT)));
-
-            displayView.setText("The pets table contains " + cursor.getCount() + " pets.\n\n");
-            displayView.append(PetEntry._ID + "-" +
-                    PetEntry.COLUMN_PET_NAME + "-" +
-                    PetEntry.COLUMN_PET_BREED + "-" +
-                    PetEntry.COLUMN_PET_GENDER + "-" +
-                    PetEntry.COLUMN_PET_WEIGHT + "\n");
+            displayView.setText("The inventory table contains " + cursor.getCount() + " products.\n\n");
+            displayView.append(InventoryContract.InventoryEntry._ID + "-" +
+                    InventoryContract.InventoryEntry.COLUMN_PRODUCT_NAME + "-" +
+                    InventoryContract.InventoryEntry.COLUMN_QUANTITY + "-" +
+                    InventoryContract.InventoryEntry.COLUMN_PRICE + "-" +
+                    InventoryContract.InventoryEntry.COLUMN_SUPPLIER_NAME + "\n");
 
             // Figure out the index of each column
-            int idColumnIndex = cursor.getColumnIndex(PetEntry._ID);
-            int nameColumnIndex = cursor.getColumnIndex(PetEntry.COLUMN_PET_NAME);
-            int breedColumnIndex = cursor.getColumnIndex(PetEntry.COLUMN_PET_BREED);
-            int genderColumnIndex = cursor.getColumnIndex(PetEntry.COLUMN_PET_GENDER);
-            int weightColumnIndex = cursor.getColumnIndex(PetEntry.COLUMN_PET_WEIGHT);
+            int idColumnIndex = cursor.getColumnIndex(InventoryEntry._ID);
+            int nameColumnIndex = cursor.getColumnIndex(InventoryContract.InventoryEntry.COLUMN_PRODUCT_NAME);
+            int breedColumnIndex = cursor.getColumnIndex(InventoryContract.InventoryEntry.COLUMN_QUANTITY);
+            int genderColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_PRICE);
+            int weightColumnIndex = cursor.getColumnIndex(InventoryContract.InventoryEntry.COLUMN_SUPPLIER_NAME);
 
             // Iterate through all the returned rows in the cursor
             while (cursor.moveToNext()) {
@@ -141,19 +127,19 @@ public class CatalogActivity extends AppCompatActivity {
 
     }
 
-    private void insertPet() {
+    private void insertInventory() {
 
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
         // Create a ContentValues object where column names are the keys,
-        // and Toto's pet attributes are the values.
+        // and inventory attributes are the values.
         ContentValues values = new ContentValues();
-        values.put(PetEntry.COLUMN_PET_NAME, "Toto");
-        values.put(PetEntry.COLUMN_PET_BREED, "Terrier");
-        values.put(PetEntry.COLUMN_PET_GENDER, PetEntry.GENDER_MALE);
-        values.put(PetEntry.COLUMN_PET_WEIGHT, 7);
+        values.put(InventoryContract.InventoryEntry.COLUMN_PRODUCT_NAME, "ABC");
+        values.put(InventoryContract.InventoryEntry.COLUMN_QUANTITY, "123");
+        values.put(InventoryContract.InventoryEntry.COLUMN_PRICE, InventoryContract.InventoryEntry.GENDER_MALE);
+        values.put(InventoryContract.InventoryEntry.COLUMN_SUPPLIER_NAME, 7);
 
-        long newRowId = db.insert(PetEntry.TABLE_NAME, null, values);
+        long newRowId = db.insert(InventoryContract.InventoryEntry.TABLE_NAME, null, values);
 
         Log.v("CatalogActivity", "New Row ID" + newRowId);
 
@@ -173,7 +159,7 @@ public class CatalogActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             // Respond to a click on the "Insert dummy data" menu option
             case R.id.action_insert_dummy_data:
-                insertPet();
+                insertInventory();
                 displayDatabaseInfo();
                 return true;
             // Respond to a click on the "Delete all entries" menu option

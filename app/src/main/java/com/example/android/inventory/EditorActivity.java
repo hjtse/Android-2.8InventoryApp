@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.android.pets;
+package com.example.android.inventory;
 
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
@@ -31,37 +31,37 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.example.android.pets.data.PetContract;
-import com.example.android.pets.data.PetContract.PetEntry;
-import com.example.android.pets.data.PetDbHelper;
+import com.example.android.inventory.data.InventoryContract;
+import com.example.android.inventory.data.InventoryContract.InventoryEntry;
+import com.example.android.inventory.data.InventoryDbHelper;
 
 /**
- * Allows user to create a new pet or edit an existing one.
+ * Allows user to create a new product or edit an existing one.
  */
 public class EditorActivity extends AppCompatActivity {
 
     /**
-     * EditText field to enter the pet's name
+     * EditText field to enter the product name
      */
-    private EditText mNameEditText;
+    private EditText mProductEditText;
 
     /**
-     * EditText field to enter the pet's breed
+     * EditText field to enter the product quantity
      */
-    private EditText mBreedEditText;
+    private EditText mQuantityEditText;
 
     /**
-     * EditText field to enter the pet's weight
+     * EditText field to enter the product supplier
      */
-    private EditText mWeightEditText;
+    private EditText mSupplierEditText;
 
     /**
-     * EditText field to enter the pet's gender
+     * EditText field to enter the product price
      */
-    private Spinner mGenderSpinner;
+    private Spinner mPriceSpinner;
 
     /**
-     * Gender of the pet. The possible values are:
+     * Gender of the product. The possible values are:
      * 0 for unknown gender, 1 for male, 2 for female.
      */
     private int mGender = 0;
@@ -72,16 +72,16 @@ public class EditorActivity extends AppCompatActivity {
         setContentView(R.layout.activity_editor);
 
         // Find all relevant views that we will need to read user input from
-        mNameEditText = (EditText) findViewById(R.id.edit_pet_name);
-        mBreedEditText = (EditText) findViewById(R.id.edit_pet_breed);
-        mWeightEditText = (EditText) findViewById(R.id.edit_pet_weight);
-        mGenderSpinner = (Spinner) findViewById(R.id.spinner_gender);
+        mProductEditText = (EditText) findViewById(R.id.edit_product_name);
+        mQuantityEditText = (EditText) findViewById(R.id.edit_product_quantity);
+        mSupplierEditText = (EditText) findViewById(R.id.edit_pet_weight);
+        mPriceSpinner = (Spinner) findViewById(R.id.spinner_gender);
 
         setupSpinner();
     }
 
     /**
-     * Setup the dropdown spinner that allows the user to select the gender of the pet.
+     * Setup the dropdown spinner that allows the user to select the gender of the product.
      */
     private void setupSpinner() {
         // Create adapter for spinner. The list options are from the String array it will use
@@ -93,20 +93,20 @@ public class EditorActivity extends AppCompatActivity {
         genderSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
 
         // Apply the adapter to the spinner
-        mGenderSpinner.setAdapter(genderSpinnerAdapter);
+        mPriceSpinner.setAdapter(genderSpinnerAdapter);
 
         // Set the integer mSelected to the constant values
-        mGenderSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        mPriceSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selection = (String) parent.getItemAtPosition(position);
                 if (!TextUtils.isEmpty(selection)) {
                     if (selection.equals(getString(R.string.gender_male))) {
-                        mGender = PetEntry.GENDER_MALE; // Male
+                        mGender = InventoryEntry.GENDER_MALE; // Male
                     } else if (selection.equals(getString(R.string.gender_female))) {
-                        mGender = PetEntry.GENDER_FEMALE; // Female
+                        mGender = InventoryContract.InventoryEntry.GENDER_FEMALE; // Female
                     } else {
-                        mGender = PetEntry.GENDER_UNKNOWN; // Unknown
+                        mGender = InventoryEntry.GENDER_UNKNOWN; // Unknown
                     }
                 }
             }
@@ -121,39 +121,39 @@ public class EditorActivity extends AppCompatActivity {
 
 
     /**
-     * Get User input from editor and save new pet into database
+     * Get User input from editor and save new product into database
      */
 
-    private void insertPet() {
+    private void insertProduct() {
 
-        String nameString = mNameEditText.getText().toString().trim();
-        String breedString = mBreedEditText.getText().toString().trim();
-        String weightString = mWeightEditText.getText().toString().trim();
-        int weight = Integer.parseInt(weightString);
+        String productString = mProductEditText.getText().toString().trim();
+        String quantityString = mQuantityEditText.getText().toString().trim();
+        String supplierString = mSupplierEditText.getText().toString().trim();
+        int weight = Integer.parseInt(supplierString);
 
         //Integer.parseInt("I") -> 1
 
 
-        PetDbHelper mDbHelper = new PetDbHelper(this);
+        InventoryDbHelper mDbHelper = new InventoryDbHelper(this);
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
         // Create a ContentValues object where column names are the keys,
-        // and Toto's pet attributes are the values.
+        // and Toto's product attributes are the values.
         ContentValues values = new ContentValues();
-        values.put(PetEntry.COLUMN_PET_NAME, nameString);
-        values.put(PetEntry.COLUMN_PET_BREED, breedString);
-        values.put(PetEntry.COLUMN_PET_GENDER, mGender);
-        values.put(PetEntry.COLUMN_PET_WEIGHT, weightString);
+        values.put(InventoryEntry.COLUMN_PRODUCT_NAME, productString);
+        values.put(InventoryEntry.COLUMN_QUANTITY, quantityString);
+        values.put(InventoryEntry.COLUMN_PRICE, mGender);
+        values.put(InventoryEntry.COLUMN_SUPPLIER_NAME, supplierString);
 
-        long newRowId = db.insert(PetEntry.TABLE_NAME, null, values);
+        long newRowId = db.insert(InventoryEntry.TABLE_NAME, null, values);
 
         Log.v("CatalogActivity", "New Row ID" + newRowId);
 
 
         if (newRowId == -1) {
-            Toast.makeText(this, "Error with saving pet", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Error with saving product", Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(this, "Pet Saved with id: " + newRowId, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "product Saved with id: " + newRowId, Toast.LENGTH_SHORT).show();
         }
 
 
@@ -174,8 +174,8 @@ public class EditorActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             // Respond to a click on the "Save" menu option
             case R.id.action_save:
-                // Save pet to database
-                insertPet();
+                // Save product to database
+                insertProduct();
                 //exit activity
                 finish();
                 return true;
