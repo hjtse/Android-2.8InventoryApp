@@ -37,10 +37,9 @@
     <string name="hint_product_quantity">Quantity</string>
     <string name="hint_supplier_name">Supplier</string>
     <string name="hint_supplier_phone">Phone</string>
-    <string name="unit_pet_weight">kg</string>
 
-    <!-- Label for dropdown menu option if the pet's gender is unknown [CHAR LIMIT=20] -->
-    <string name="gender_unknown">Unknown</string>
-    <string name="gender_male">Male</string>
-    <string name="gender_female">Female</string>
+    <!-- Label for dropdown menu option of price [CHAR LIMIT=20] -->
+    <string name="price_free">$</string>
+    <string name="price_cheap">$$</string>
+    <string name="price_expensive">$$$</string>
 </resources>

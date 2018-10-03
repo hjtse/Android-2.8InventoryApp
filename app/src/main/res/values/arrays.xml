@@ -11,10 +11,10 @@
      limitations under the License.
 -->
 <resources>
-    <!-- These are the options displayed in the gender drop-down Spinner -->
-    <string-array name="array_gender_options">
-        <item>@string/gender_unknown</item>
-        <item>@string/gender_male</item>
-        <item>@string/gender_female</item>
+    <!-- These are the options displayed in the price drop-down Spinner -->
+    <string-array name="array_price_options">
+        <item>@string/price_free</item>
+        <item>@string/price_cheap</item>
+        <item>@string/price_expensive</item>
     </string-array>
 </resources>

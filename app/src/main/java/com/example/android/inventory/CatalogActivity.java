@@ -141,7 +141,7 @@ public class CatalogActivity extends AppCompatActivity {
         ContentValues values = new ContentValues();
         values.put(InventoryContract.InventoryEntry.COLUMN_PRODUCT_NAME, "ABC");
         values.put(InventoryContract.InventoryEntry.COLUMN_QUANTITY, "123");
-        values.put(InventoryContract.InventoryEntry.COLUMN_PRICE, InventoryContract.InventoryEntry.GENDER_MALE);
+        values.put(InventoryContract.InventoryEntry.COLUMN_PRICE, InventoryContract.InventoryEntry.PRICE_CHEAP);
         values.put(InventoryContract.InventoryEntry.COLUMN_SUPPLIER_NAME, 7);
         values.put(InventoryContract.InventoryEntry.COLUMN_SUPPLIER_PHONE, 1234567890);
 

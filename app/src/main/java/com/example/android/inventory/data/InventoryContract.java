@@ -21,11 +21,11 @@ public final class InventoryContract {
         public static final String COLUMN_SUPPLIER_PHONE = "phone";
 
         /**
-         * Gender Values
+         * Price Values
          */
-        public static final int GENDER_UNKNOWN = 0;
-        public static final int GENDER_MALE = 1;
-        public static final int GENDER_FEMALE = 2;
+        public static final int PRICE_FREE = 0;
+        public static final int PRICE_CHEAP = 1;
+        public static final int PRICE_FEMALE = 2;
 
     }
 }

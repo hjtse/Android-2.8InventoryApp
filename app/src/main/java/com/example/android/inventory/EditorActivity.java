@@ -67,10 +67,10 @@ public class EditorActivity extends AppCompatActivity {
     private EditText mPhoneEditText;
 
     /**
-     * Gender of the product. The possible values are:
-     * 0 for unknown gender, 1 for male, 2 for female.
+     * Price of the product. The possible values are:
+     * 0 for unknown price, 1 for male, 2 for female.
      */
-    private int mGender = 0;
+    private int mPrice = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,27 +80,27 @@ public class EditorActivity extends AppCompatActivity {
         // Find all relevant views that we will need to read user input from
         mProductEditText = (EditText) findViewById(R.id.edit_product_name);
         mQuantityEditText = (EditText) findViewById(R.id.edit_product_quantity);
-        mSupplierEditText = (EditText) findViewById(R.id.edit_pet_weight);
+        mSupplierEditText = (EditText) findViewById(R.id.edit_supplier_name);
         mPhoneEditText = (EditText) findViewById(R.id.edit_supplier_phone);
-        mPriceSpinner = (Spinner) findViewById(R.id.spinner_gender);
+        mPriceSpinner = (Spinner) findViewById(R.id.spinner_price);
 
         setupSpinner();
     }
 
     /**
-     * Setup the dropdown spinner that allows the user to select the gender of the product.
+     * Setup the dropdown spinner that allows the user to select the price of the product.
      */
     private void setupSpinner() {
         // Create adapter for spinner. The list options are from the String array it will use
         // the spinner will use the default layout
-        ArrayAdapter genderSpinnerAdapter = ArrayAdapter.createFromResource(this,
-                R.array.array_gender_options, android.R.layout.simple_spinner_item);
+        ArrayAdapter priceSpinnerAdapter = ArrayAdapter.createFromResource(this,
+                R.array.array_price_options, android.R.layout.simple_spinner_item);
 
         // Specify dropdown layout style - simple list view with 1 item per line
-        genderSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
+        priceSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
 
         // Apply the adapter to the spinner
-        mPriceSpinner.setAdapter(genderSpinnerAdapter);
+        mPriceSpinner.setAdapter(priceSpinnerAdapter);
 
         // Set the integer mSelected to the constant values
         mPriceSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -108,12 +108,12 @@ public class EditorActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selection = (String) parent.getItemAtPosition(position);
                 if (!TextUtils.isEmpty(selection)) {
-                    if (selection.equals(getString(R.string.gender_male))) {
-                        mGender = InventoryEntry.GENDER_MALE; // Male
-                    } else if (selection.equals(getString(R.string.gender_female))) {
-                        mGender = InventoryContract.InventoryEntry.GENDER_FEMALE; // Female
+                    if (selection.equals(getString(R.string.price_cheap))) {
+                        mPrice = InventoryEntry.PRICE_CHEAP; // Male
+                    } else if (selection.equals(getString(R.string.price_expensive))) {
+                        mPrice = InventoryContract.InventoryEntry.PRICE_FEMALE; // Female
                     } else {
-                        mGender = InventoryEntry.GENDER_UNKNOWN; // Unknown
+                        mPrice = InventoryEntry.PRICE_FREE; // Unknown
                     }
                 }
             }
@@ -121,7 +121,7 @@ public class EditorActivity extends AppCompatActivity {
             // Because AdapterView is an abstract class, onNothingSelected must be defined
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                mGender = 0; // Unknown
+                mPrice = 0; // Unknown
             }
         });
     }
@@ -150,7 +150,7 @@ public class EditorActivity extends AppCompatActivity {
         ContentValues values = new ContentValues();
         values.put(InventoryEntry.COLUMN_PRODUCT_NAME, productString);
         values.put(InventoryEntry.COLUMN_QUANTITY, quantityString);
-        values.put(InventoryEntry.COLUMN_PRICE, mGender);
+        values.put(InventoryEntry.COLUMN_PRICE, mPrice);
         values.put(InventoryEntry.COLUMN_SUPPLIER_NAME, supplierString);
         values.put(InventoryEntry.COLUMN_SUPPLIER_PHONE, phoneString);
 
