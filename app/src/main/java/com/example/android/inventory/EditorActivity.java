@@ -60,6 +60,12 @@ public class EditorActivity extends AppCompatActivity {
      */
     private Spinner mPriceSpinner;
 
+
+    /**
+     * EditText field to enter the supplier phone
+     */
+    private EditText mPhoneEditText;
+
     /**
      * Gender of the product. The possible values are:
      * 0 for unknown gender, 1 for male, 2 for female.
@@ -75,6 +81,7 @@ public class EditorActivity extends AppCompatActivity {
         mProductEditText = (EditText) findViewById(R.id.edit_product_name);
         mQuantityEditText = (EditText) findViewById(R.id.edit_product_quantity);
         mSupplierEditText = (EditText) findViewById(R.id.edit_pet_weight);
+        mPhoneEditText = (EditText) findViewById(R.id.edit_supplier_phone);
         mPriceSpinner = (Spinner) findViewById(R.id.spinner_gender);
 
         setupSpinner();
@@ -129,6 +136,7 @@ public class EditorActivity extends AppCompatActivity {
         String productString = mProductEditText.getText().toString().trim();
         String quantityString = mQuantityEditText.getText().toString().trim();
         String supplierString = mSupplierEditText.getText().toString().trim();
+        String phoneString = mPhoneEditText.getText().toString().trim();
         int weight = Integer.parseInt(supplierString);
 
         //Integer.parseInt("I") -> 1
@@ -138,12 +146,13 @@ public class EditorActivity extends AppCompatActivity {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
         // Create a ContentValues object where column names are the keys,
-        // and Toto's product attributes are the values.
+        // and product attributes are the values.
         ContentValues values = new ContentValues();
         values.put(InventoryEntry.COLUMN_PRODUCT_NAME, productString);
         values.put(InventoryEntry.COLUMN_QUANTITY, quantityString);
         values.put(InventoryEntry.COLUMN_PRICE, mGender);
         values.put(InventoryEntry.COLUMN_SUPPLIER_NAME, supplierString);
+        values.put(InventoryEntry.COLUMN_SUPPLIER_PHONE, phoneString);
 
         long newRowId = db.insert(InventoryEntry.TABLE_NAME, null, values);
 

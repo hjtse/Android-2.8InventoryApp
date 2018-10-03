@@ -18,6 +18,7 @@ public final class InventoryContract {
         public static final String COLUMN_PRICE = "price";
         public static final String COLUMN_QUANTITY = "quantity";
         public static final String COLUMN_SUPPLIER_NAME = "supplier";
+        public static final String COLUMN_SUPPLIER_PHONE = "phone";
 
         /**
          * Gender Values

@@ -72,6 +72,7 @@ public class CatalogActivity extends AppCompatActivity {
                 InventoryContract.InventoryEntry.COLUMN_QUANTITY,
                 InventoryContract.InventoryEntry.COLUMN_SUPPLIER_NAME,
                 InventoryContract.InventoryEntry.COLUMN_PRICE,
+                InventoryContract.InventoryEntry.COLUMN_SUPPLIER_PHONE,
         };
 
 
@@ -93,14 +94,16 @@ public class CatalogActivity extends AppCompatActivity {
                     InventoryContract.InventoryEntry.COLUMN_PRODUCT_NAME + "-" +
                     InventoryContract.InventoryEntry.COLUMN_QUANTITY + "-" +
                     InventoryContract.InventoryEntry.COLUMN_PRICE + "-" +
-                    InventoryContract.InventoryEntry.COLUMN_SUPPLIER_NAME + "\n");
+                    InventoryContract.InventoryEntry.COLUMN_SUPPLIER_NAME + "-" +
+                    InventoryContract.InventoryEntry.COLUMN_SUPPLIER_PHONE + "\n");
 
             // Figure out the index of each column
             int idColumnIndex = cursor.getColumnIndex(InventoryEntry._ID);
             int nameColumnIndex = cursor.getColumnIndex(InventoryContract.InventoryEntry.COLUMN_PRODUCT_NAME);
-            int breedColumnIndex = cursor.getColumnIndex(InventoryContract.InventoryEntry.COLUMN_QUANTITY);
-            int genderColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_PRICE);
-            int weightColumnIndex = cursor.getColumnIndex(InventoryContract.InventoryEntry.COLUMN_SUPPLIER_NAME);
+            int quantityColumnIndex = cursor.getColumnIndex(InventoryContract.InventoryEntry.COLUMN_QUANTITY);
+            int priceColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_PRICE);
+            int supplierColumnIndex = cursor.getColumnIndex(InventoryContract.InventoryEntry.COLUMN_SUPPLIER_NAME);
+            int phoneColumnIndex = cursor.getColumnIndex(InventoryContract.InventoryEntry.COLUMN_SUPPLIER_PHONE);
 
             // Iterate through all the returned rows in the cursor
             while (cursor.moveToNext()) {
@@ -108,15 +111,17 @@ public class CatalogActivity extends AppCompatActivity {
                 // at the current row the cursor is on.
                 int currentID = cursor.getInt(idColumnIndex);
                 String currentName = cursor.getString(nameColumnIndex);
-                String currentBreed = cursor.getString(breedColumnIndex);
-                int currentGender = cursor.getInt(genderColumnIndex);
-                int currentWeight = cursor.getInt(weightColumnIndex);
+                String currentQuantity = cursor.getString(quantityColumnIndex);
+                int currentPrice = cursor.getInt(priceColumnIndex);
+                int currentSupplier = cursor.getInt(supplierColumnIndex);
+                int currentPhone = cursor.getInt(phoneColumnIndex);
                 // Display the values from each column of the current row in the cursor in the TextView
                 displayView.append(("\n" + currentID + " - " +
                         currentName + " - " +
-                        currentBreed + " - " +
-                        currentGender + " - " +
-                        currentWeight));
+                        currentQuantity + " - " +
+                        currentPrice + " - " +
+                        currentSupplier + " - " +
+                        currentPhone));
             }
         } finally {
             // Always close the cursor when you're done reading from it. This releases all its
@@ -138,6 +143,7 @@ public class CatalogActivity extends AppCompatActivity {
         values.put(InventoryContract.InventoryEntry.COLUMN_QUANTITY, "123");
         values.put(InventoryContract.InventoryEntry.COLUMN_PRICE, InventoryContract.InventoryEntry.GENDER_MALE);
         values.put(InventoryContract.InventoryEntry.COLUMN_SUPPLIER_NAME, 7);
+        values.put(InventoryContract.InventoryEntry.COLUMN_SUPPLIER_PHONE, 1234567890);
 
         long newRowId = db.insert(InventoryContract.InventoryEntry.TABLE_NAME, null, values);
 
