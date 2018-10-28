@@ -2,7 +2,6 @@ package com.example.android.inventory;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +9,6 @@ import android.widget.CursorAdapter;
 import android.widget.TextView;
 
 import com.example.android.inventory.data.InventoryContract;
-import com.example.android.inventory.data.InventoryContract.InventoryEntry;
 
 
 /**
@@ -58,27 +56,36 @@ public class InventoryCursorAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         // Find individual views that we want to modify in the list item layout
-        TextView nameTextView = (TextView) view.findViewById(R.id.name);
-        TextView summaryTextView = (TextView) view.findViewById(R.id.summary);
+        TextView nameTextView = (TextView) view.findViewById(R.id.product_id);
+        TextView quantityTextView = (TextView) view.findViewById(R.id.quantity_id);
+        TextView priceTextView = (TextView) view.findViewById(R.id.price_id);
+
 
         // Find the columns of inventory attributes that we're interested in
+        int _id = cursor.getInt(cursor.getColumnIndexOrThrow(InventoryContract.InventoryEntry._ID));
+//        String nameColumnIndex = cursor.getString(cursor.getColumnIndexOrThrow(InventoryContract.InventoryEntry.COLUMN_PRODUCT_NAME));
+//        String quantityColumnIndex = cursor.getString(cursor.getColumnIndexOrThrow(InventoryContract.InventoryEntry.COLUMN_QUANTITY));
+//        String priceColumnIndex = cursor.getString(cursor.getColumnIndexOrThrow(InventoryContract.InventoryEntry.COLUMN_PRICE));
         int nameColumnIndex = cursor.getColumnIndex(InventoryContract.InventoryEntry.COLUMN_PRODUCT_NAME);
         int quantityColumnIndex = cursor.getColumnIndex(InventoryContract.InventoryEntry.COLUMN_QUANTITY);
+        int priceColumnIndex = cursor.getColumnIndex(InventoryContract.InventoryEntry.COLUMN_PRICE);
 
         // Read the inventory attributes from the Cursor for the current inventory
-        String inventoryName = cursor.getString(nameColumnIndex);
-        String inventoryQuantity = cursor.getString(quantityColumnIndex);
+        String productName = cursor.getString(nameColumnIndex);
+        String productQuantity = cursor.getString(quantityColumnIndex);
+        String productPrice = cursor.getString(priceColumnIndex);
+
+        // Update the TextViews with the attributes for the current inventory
+        nameTextView.setText(productName);
+        quantityTextView.setText(productQuantity);
+        priceTextView.setText(productPrice);
 
 
         // If the inventory breed is empty string or null, then use some default text
         // that says "Unknown breed", so the TextView isn't blank.
-        if (TextUtils.isEmpty(inventoryQuantity)) {
-            inventoryQuantity = context.getString(R.string.unknown_quantity);
-        }
+//        if (TextUtils.isEmpty(inventoryQuantity)) {
+//            inventoryQuantity = context.getString(R.string.unknown_quantity);
+//        }
 
-
-        // Update the TextViews with the attributes for the current inventory
-        nameTextView.setText(inventoryName);
-        summaryTextView.setText(inventoryQuantity);
     }
 }
