@@ -33,7 +33,7 @@ public final class InventoryContract {
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_INVENTORY;
 
         /**
-         * Name of database table for pets
+         * Name of database table for products
          */
         public static final String TABLE_NAME = "inventory";
 

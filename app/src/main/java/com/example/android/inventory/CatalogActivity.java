@@ -7,10 +7,8 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.BaseColumns;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -19,18 +17,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.example.android.inventory.data.InventoryContract;
 import com.example.android.inventory.data.InventoryContract.InventoryEntry;
-import com.example.android.inventory.data.InventoryDbHelper;
 
 /**
  * Displays list of products that were entered and stored in the app.
  */
 public class CatalogActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private static final int PET_LOADER = 0;
+    private static final int INVENTORY_LOADER = 0;
     com.example.android.inventory.InventoryCursorAdapter mCursorAdapter;
 
     @Override
@@ -48,62 +44,61 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
             }
         });
 
-        // Find the ListView which will be populated with the pet data
-        ListView petListView = (ListView) findViewById(R.id.list);
+        // Find the ListView which will be populated with the inventory data
+        ListView inventoryListView = (ListView) findViewById(R.id.list);
 
         // Find and set empty view on the ListView, so that it only shows when the list has 0 items.
         View emptyView = findViewById(R.id.empty_view);
-        petListView.setEmptyView(emptyView);
+        inventoryListView.setEmptyView(emptyView);
 
-        // Setup an Adapter to create a list item for each row of pet data in the Cursor.
-        // There is no pet data yet (until the loader finishes) so pass in null for the Cursor.
+        // Setup an Adapter to create a list item for each row of inventory data in the Cursor.
+        // There is no inventory data yet (until the loader finishes) so pass in null for the Cursor.
         mCursorAdapter = new com.example.android.inventory.InventoryCursorAdapter(this, null);
-        petListView.setAdapter(mCursorAdapter);
+        inventoryListView.setAdapter(mCursorAdapter);
 
         // Setup the item click listener
-        petListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        inventoryListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 // Create new intent to go to {@link EditorActivity}
                 Intent intent = new Intent(CatalogActivity.this, EditorActivity.class);
-                // Form the content URI that represents the specific pet that was clicked on,
+                // Form the content URI that represents the specific inventory that was clicked on,
                 // by appending the "id" (passed as input to this method) onto the
-                // {@link PetEntry#CONTENT_URI}.
-                // For example, the URI would be "content://com.example.android.pets/pets/2"
-                // if the pet with ID 2 was clicked on.
-                Uri currentPetUri = ContentUris.withAppendedId(InventoryEntry.CONTENT_URI, id);
+                // {@link InventoryEntry#CONTENT_URI}.
+                // For example, the URI would be "content://com.example.android.inventory/inventory/2"
+                // if the inventory with ID 2 was clicked on.
+                Uri currentInventoryUri = ContentUris.withAppendedId(InventoryEntry.CONTENT_URI, id);
                 // Set the URI on the data field of the intent
-                intent.setData(currentPetUri);
-                // Launch the {@link EditorActivity} to display the data for the current pet.
+                intent.setData(currentInventoryUri);
+                // Launch the {@link EditorActivity} to display the data for the current inventory.
                 startActivity(intent);
             }
         });
 
 
         // Kick off the loader
-        getLoaderManager().initLoader(PET_LOADER, null, this);
+        getLoaderManager().initLoader(INVENTORY_LOADER, null, this);
 
 
     }
 
 
-    private void insertPet() {
-        // Create a ContentValues object where column names are the keys,
-        // and Toto's pet attributes are the values.
+    private void insertProduct() {
+        // Create a ContentValues object where column names are the keys, and inventory attributes are the values.
         ContentValues values = new ContentValues();
-        values.put(InventoryContract.InventoryEntry.COLUMN_PRODUCT_NAME, "ABC");
+        values.put(InventoryContract.InventoryEntry.COLUMN_PRODUCT_NAME, "PRODUCT");
         values.put(InventoryContract.InventoryEntry.COLUMN_QUANTITY, "123");
         values.put(InventoryContract.InventoryEntry.COLUMN_PRICE, InventoryContract.InventoryEntry.PRICE_CHEAP);
-        values.put(InventoryContract.InventoryEntry.COLUMN_SUPPLIER_NAME, 7);
+        values.put(InventoryContract.InventoryEntry.COLUMN_SUPPLIER_NAME, "SUPPLIER");
         values.put(InventoryContract.InventoryEntry.COLUMN_SUPPLIER_PHONE, 1234567890);
 
         Uri newUri = getContentResolver().insert(InventoryEntry.CONTENT_URI, values);
 
     }
 
-    private void deleteAllPets() {
+    private void deleteAllInventory() {
         int rowsDeleted = getContentResolver().delete(InventoryEntry.CONTENT_URI, null, null);
-        Log.v("CatalogActivity", rowsDeleted + " rows deleted from pet database");
+        Log.v("CatalogActivity", rowsDeleted + " rows deleted from inventory database");
     }
 
 
@@ -121,11 +116,11 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         switch (item.getItemId()) {
             // Respond to a click on the "Insert dummy data" menu option
             case R.id.action_insert_dummy_data:
-                insertPet();
+                insertProduct();
                 return true;
             // Respond to a click on the "Delete all entries" menu option
             case R.id.action_delete_all_entries:
-                deleteAllPets();
+                deleteAllInventory();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -151,7 +146,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        // Update {@link PetCursorAdapter} with this new cursor containing updated pet data
+        // Update {@link InventoryCursorAdapter} with this new cursor containing updated inventory data
         mCursorAdapter.swapCursor(data);
     }
 

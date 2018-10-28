@@ -32,72 +32,44 @@ import com.example.android.inventory.data.InventoryContract.InventoryEntry;
 public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     /**
-     * Identifier for the pet data loader
+     * Identifier for the inventory data loader
      */
-    private static final int EXISTING_PET_LOADER = 0;
+    private static final int EXISTING_INVENTORY_LOADER = 0;
 
     /**
-     * Content URI for the existing pet (null if it's a new pet)
+     * Content URI for the existing inventory (null if it's a new inventory)
      */
 
-    private Uri mCurrentPetUri;
+    private Uri mCurrentInventoryUri;
 
     /**
      * EditText field to enter the product name
      */
     private EditText mProductEditText;
-
-    /**
-     * EditText field to enter the product quantity
-     */
     private EditText mQuantityEditText;
-
-    /**
-     * EditText field to enter the product supplier
-     */
     private EditText mSupplierEditText;
-
-    /**
-     * EditText field to enter the product price
-     */
-    private EditText mPriceEditText;
-
-    /**
-     * EditText field to enter the product price
-     */
+    private EditText mPhoneEditText;
     private Spinner mPriceSpinner;
-
     /**
-     * Gender of the pet. The possible valid values are in the PetContract.java file:
+     * Price of the product. The possible valid values are in the InventoryContract.java file:
      * {@link InventoryEntry#PRICE_FREE}, {@link InventoryEntry#PRICE_CHEAP}, or
      * {@link InventoryEntry#PRICE_EXPENSIVE}.
      */
-    private int mGender = InventoryEntry.PRICE_FREE;
+    private int mPrice = InventoryEntry.PRICE_FREE;
 
     /**
-     * EditText field to enter the supplier phone
+     * Boolean flag that keeps track of whether the inventory has been edited (true) or not (false)
      */
-    private EditText mPhoneEditText;
-
-    /**
-     * Price of the product. The possible values are:
-     * 0 for unknown price, 1 for male, 2 for female.
-     */
-    private int mPrice = 0;
-
-    /**
-     * Boolean flag that keeps track of whether the pet has been edited (true) or not (false)
-     */
-    private boolean mPetHasChanged = false;
+    private boolean mInventoryHasChanged = false;
 
     /**
      * OnTouchListener that listens for any user touches on a View, implying that they are modifying
-     * the view, and we change the mPetHasChanged boolean to true.
+     * the view, and we change the mInventoryHasChanged boolean to true.
      */
     private View.OnTouchListener mTouchListener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View view, MotionEvent motionEvent) {
-            mPetHasChanged = true;
+            mInventoryHasChanged = true;
             return false;
         }
     };
@@ -109,26 +81,26 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         setContentView(R.layout.activity_editor);
 
         // Examine the intent that was used to launch this activity,
-        // in order to figure out if we're creating a new pet or editing an existing one.
+        // in order to figure out if we're creating a new product or editing an existing one.
         Intent intent = getIntent();
-        mCurrentPetUri = intent.getData();
+        mCurrentInventoryUri = intent.getData();
 
-        // If the intent DOES NOT contain a pet content URI, then we know that we are
-        // creating a new pet.
-        if (mCurrentPetUri == null) {
-            // This is a new pet, so change the app bar to say "Add a Pet"
+        // If the intent DOES NOT contain a product content URI, then we know that we are
+        // creating a new product.
+        if (mCurrentInventoryUri == null) {
+            // This is a new product, so change the app bar to say "Add a Product"
             setTitle(getString(R.string.editor_activity_title_new_product));
 
             // Invalidate the options menu, so the "Delete" menu option can be hidden.
-            // (It doesn't make sense to delete a pet that hasn't been created yet.)
+            // (It doesn't make sense to delete a inventory that hasn't been created yet.)
             invalidateOptionsMenu();
         } else {
-            // Otherwise this is an existing pet, so change app bar to say "Edit Pet"
+            // Otherwise this is an existing inventory, so change app bar to say "Edit a Product"
             setTitle(getString(R.string.editor_activity_title_edit_product));
 
-            // Initialize a loader to read the pet data from the database
+            // Initialize a loader to read the inventory data from the database
             // and display the current values in the editor
-            getLoaderManager().initLoader(EXISTING_PET_LOADER, null, this);
+            getLoaderManager().initLoader(EXISTING_INVENTORY_LOADER, null, this);
         }
 
 
@@ -182,7 +154,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             // Because AdapterView is an abstract class, onNothingSelected must be defined
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                mGender = InventoryEntry.PRICE_FREE;
+                mPrice = InventoryEntry.PRICE_FREE;
             }
         });
     }
@@ -198,64 +170,56 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         String quantityString = mQuantityEditText.getText().toString().trim();
         String supplierString = mSupplierEditText.getText().toString().trim();
         String phoneString = mPhoneEditText.getText().toString().trim();
-        String priceString = mPriceEditText.getText().toString().trim();
 
-        // Check if this is supposed to be a new pet and check if all the fields in the editor are blank
-        if (mCurrentPetUri == null &&
-                TextUtils.isEmpty(productString) && TextUtils.isEmpty(quantityString) &&
-                TextUtils.isEmpty(priceString) && mGender == InventoryEntry.PRICE_FREE) {
-            // Since no fields were modified, we can return early without creating a new pet.
+        // Check if this is supposed to be a new inventory and check if all the fields in the editor are blank
+        if (mCurrentInventoryUri == null &&
+                TextUtils.isEmpty(productString) &&
+                TextUtils.isEmpty(quantityString) &&
+                TextUtils.isEmpty(supplierString) &&
+                TextUtils.isEmpty(phoneString) &&
+                mPrice == InventoryEntry.PRICE_FREE) {
+            // Since no fields were modified, we can return early without creating a new inventory.
             // No need to create ContentValues and no need to do any ContentProvider operations.
             return;
         }
 
-        // Create a ContentValues object where column names are the keys,
-        // and product attributes are the values.
+        // Create a ContentValues object where column names are the keys, and product attributes are the values.
         ContentValues values = new ContentValues();
         values.put(InventoryEntry.COLUMN_PRODUCT_NAME, productString);
         values.put(InventoryEntry.COLUMN_QUANTITY, quantityString);
-        values.put(InventoryEntry.COLUMN_PRICE, mPrice);
         values.put(InventoryEntry.COLUMN_SUPPLIER_NAME, supplierString);
         values.put(InventoryEntry.COLUMN_SUPPLIER_PHONE, phoneString);
+        values.put(InventoryEntry.COLUMN_PRICE, mPrice);
 
-
-        // If the weight is not provided by the user, don't try to parse the string into an
-        // integer value. Use 0 by default.
-        int price = 0;
-        if (!TextUtils.isEmpty(priceString)) {
-            price = Integer.parseInt(priceString);
-        }
-        values.put(InventoryEntry.COLUMN_PRICE, price);
-
-        // Determine if this is a new or existing pet by checking if mCurrentPetUri is null or not
-        if (mCurrentPetUri == null) {
-            // This is a NEW pet, so insert a new pet into the provider,
-            // returning the content URI for the new pet.
+        // Determine if this is a new or existing inventory by checking if mCurrentInventoryUri is null or not
+        if (mCurrentInventoryUri == null) {
+            // This is a NEW inventory, so insert a new inventory into the provider,
+            // returning the content URI for the new inventory.
             Uri newUri = getContentResolver().insert(InventoryEntry.CONTENT_URI, values);
             // Show a toast message depending on whether or not the insertion was successful.
             if (newUri == null) {
                 // If the new content URI is null, then there was an error with insertion.
-                Toast.makeText(this, getString(R.string.editor_insert_pet_failed),
+                Toast.makeText(this, getString(R.string.editor_insert_product_failed),
                         Toast.LENGTH_SHORT).show();
             } else {
                 // Otherwise, the insertion was successful and we can display a toast.
-                Toast.makeText(this, getString(R.string.editor_insert_pet_successful),
+                Toast.makeText(this, getString(R.string.editor_insert_product_successful),
                         Toast.LENGTH_SHORT).show();
             }
         } else {
-            // Otherwise this is an EXISTING pet, so update the pet with content URI: mCurrentPetUri
+            // Otherwise this is an EXISTING inventory, so update the inventory with content URI: mCurrentInventoryUri
             // and pass in the new ContentValues. Pass in null for the selection and selection args
-            // because mCurrentPetUri will already identify the correct row in the database that
+            // because mCurrentInventoryUri will already identify the correct row in the database that
             // we want to modify.
-            int rowsAffected = getContentResolver().update(mCurrentPetUri, values, null, null);
+            int rowsAffected = getContentResolver().update(mCurrentInventoryUri, values, null, null);
             // Show a toast message depending on whether or not the update was successful.
             if (rowsAffected == 0) {
                 // If no rows were affected, then there was an error with the update.
-                Toast.makeText(this, getString(R.string.editor_update_pet_failed),
+                Toast.makeText(this, getString(R.string.editor_update_product_failed),
                         Toast.LENGTH_SHORT).show();
             } else {
                 // Otherwise, the update was successful and we can display a toast.
-                Toast.makeText(this, getString(R.string.editor_update_pet_successful),
+                Toast.makeText(this, getString(R.string.editor_update_product_successful),
                         Toast.LENGTH_SHORT).show();
             }
         }
@@ -284,13 +248,14 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 return true;
             // Respond to a click on the "Delete" menu option
             case R.id.action_delete:
-                // Do nothing for now
+                // Pop up confirmation dialog for deletion
+                showDeleteConfirmationDialog();
                 return true;
             // Respond to a click on the "Up" arrow button in the app bar
             case android.R.id.home:
-                // If the pet hasn't changed, continue with navigating up to parent activity
+                // If the inventory hasn't changed, continue with navigating up to parent activity
                 // which is the {@link CatalogActivity}.
-                if (!mPetHasChanged) {
+                if (!mInventoryHasChanged) {
                     NavUtils.navigateUpFromSameTask(EditorActivity.this);
                     return true;
                 }
@@ -317,8 +282,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
      */
     @Override
     public void onBackPressed() {
-        // If the pet hasn't changed, continue with handling back button press
-        if (!mPetHasChanged) {
+        // If the inventory hasn't changed, continue with handling back button press
+        if (!mInventoryHasChanged) {
             super.onBackPressed();
             return;
         }
@@ -338,8 +303,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        // Since the editor shows all pet attributes, define a projection that contains
-        // all columns from the pet table
+        // Since the editor shows all inventory attributes, define a projection that contains
+        // all columns from the inventory table
         String[] projection = {
                 InventoryEntry._ID,
                 InventoryEntry.COLUMN_PRODUCT_NAME,
@@ -350,7 +315,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
         // This loader will execute the ContentProvider's query method on a background thread
         return new CursorLoader(this,   // Parent activity context
-                mCurrentPetUri,         // Query the content URI for the current pet
+                mCurrentInventoryUri,         // Query the content URI for the current inventory
                 projection,             // Columns to include in the resulting Cursor
                 null,                   // No selection clause
                 null,                   // No selection arguments
@@ -367,30 +332,30 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         // Proceed with moving to the first row of the cursor and reading data from it
         // (This should be the only row in the cursor)
         if (cursor.moveToFirst()) {
-            // Find the columns of pet attributes that we're interested in
+            // Find the columns of inventory attributes that we're interested in
             int nameColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_PRODUCT_NAME);
-            int breedColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_QUANTITY);
-            int genderColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_PRICE);
-            int weightColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_SUPPLIER_NAME);
-            int suppliernumberColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_SUPPLIER_PHONE);
+            int quantityColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_QUANTITY);
+            int priceColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_PRICE);
+            int supplierColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_SUPPLIER_NAME);
+            int phoneColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_SUPPLIER_PHONE);
 
             // Extract out the value from the Cursor for the given column index
             String name = cursor.getString(nameColumnIndex);
-            String breed = cursor.getString(breedColumnIndex);
-            int gender = cursor.getInt(genderColumnIndex);
-            int weight = cursor.getInt(weightColumnIndex);
-            int suppliernumber = cursor.getInt(suppliernumberColumnIndex);
+            String quantity = cursor.getString(quantityColumnIndex);
+            int price = cursor.getInt(priceColumnIndex);
+            int supplierName = cursor.getInt(supplierColumnIndex);
+            int supplierNumber = cursor.getInt(phoneColumnIndex);
 
             // Update the views on the screen with the values from the database
-            mPriceEditText.setText(name);
-            mQuantityEditText.setText(breed);
-            mSupplierEditText.setText(Integer.toString(weight));
-            mPhoneEditText.setText(Integer.toString(suppliernumber));
+            mProductEditText.setText(name);
+            mQuantityEditText.setText(quantity);
+            mSupplierEditText.setText(Integer.toString(supplierName));
+            mPhoneEditText.setText(Integer.toString(supplierNumber));
 
             // Gender is a dropdown spinner, so map the constant value from the database
             // into one of the dropdown options (0 is Unknown, 1 is Male, 2 is Female).
             // Then call setSelection() so that option is displayed on screen as the current selection.
-            switch (gender) {
+            switch (price) {
                 case InventoryEntry.PRICE_CHEAP:
                     mPriceSpinner.setSelection(1);
                     break;
@@ -431,7 +396,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         builder.setNegativeButton(R.string.keep_editing, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 // User clicked the "Keep editing" button, so dismiss the dialog
-                // and continue editing the pet.
+                // and continue editing the inventory.
                 if (dialog != null) {
                     dialog.dismiss();
                 }
@@ -445,8 +410,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        // If this is a new pet, hide the "Delete" menu item.
-        if (mCurrentPetUri == null) {
+        // If this is a new inventory, hide the "Delete" menu item.
+        if (mCurrentInventoryUri == null) {
             MenuItem menuItem = menu.findItem(R.id.action_delete);
             menuItem.setVisible(false);
         }
@@ -460,14 +425,14 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         builder.setMessage(R.string.delete_dialog_msg);
         builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                // User clicked the "Delete" button, so delete the pet.
-                deletePet();
+                // User clicked the "Delete" button, so delete the inventory.
+                deleteInventory();
             }
         });
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 // User clicked the "Cancel" button, so dismiss the dialog
-                // and continue editing the pet.
+                // and continue editing the inventory.
                 if (dialog != null) {
                     dialog.dismiss();
                 }
@@ -480,24 +445,24 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     }
 
     /**
-     * Perform the deletion of the pet in the database.
+     * Perform the deletion of the inventory in the database.
      */
-    private void deletePet() {
+    private void deleteInventory() {
 
-        // Only perform the delete if this is an existing pet.
-        if (mCurrentPetUri != null) {
-            // Call the ContentResolver to delete the pet at the given content URI.
-            // Pass in null for the selection and selection args because the mCurrentPetUri
-            // content URI already identifies the pet that we want.
-            int rowsDeleted = getContentResolver().delete(mCurrentPetUri, null, null);
+        // Only perform the delete if this is an existing inventory.
+        if (mCurrentInventoryUri != null) {
+            // Call the ContentResolver to delete the inventory at the given content URI.
+            // Pass in null for the selection and selection args because the mCurrentInventoryUri
+            // content URI already identifies the inventory that we want.
+            int rowsDeleted = getContentResolver().delete(mCurrentInventoryUri, null, null);
 
             if (rowsDeleted == 0) {
                 // If no rows were affected, then there was an error with the update.
-                Toast.makeText(this, getString(R.string.editor_update_pet_failed),
+                Toast.makeText(this, getString(R.string.editor_update_product_failed),
                         Toast.LENGTH_SHORT).show();
             } else {
                 // Otherwise, the update was successful and we can display a toast.
-                Toast.makeText(this, getString(R.string.editor_update_pet_successful),
+                Toast.makeText(this, getString(R.string.editor_update_product_successful),
                         Toast.LENGTH_SHORT).show();
             }
 

@@ -13,14 +13,14 @@ import com.example.android.inventory.data.InventoryContract.InventoryEntry;
 
 
 /**
- * {@link ContentProvider} for Pets app.
+ * {@link ContentProvider} for inventory app.
  */
 public class InventoryProvider extends ContentProvider {
 
     public static final String LOG_TAG = InventoryProvider.class.getSimpleName();
 
     /**
-     * URI matcher code for the content URI for the pets table
+     * URI matcher code for the content URI for the inventory table
      */
     private static final int INVENTORY = 100;
     private static final int INVENTORY_ID = 101;
@@ -58,14 +58,14 @@ public class InventoryProvider extends ContentProvider {
         int match = sUriMatcher.match(uri);
         switch (match) {
             case INVENTORY:
-                // For the INVENTORY code, query the pets table directly with the given
+                // For the INVENTORY code, query the inventory table directly with the given
                 // projection, selection, selection arguments, and sort order. The cursor
-                // could contain multiple rows of the pets table.
+                // could contain multiple rows of the inventory table.
                 cursor = database.query(InventoryContract.InventoryEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
                 break;
             case INVENTORY_ID:
                 // For the INVENTORY_ID code, extract out the ID from the URI.
-                // For an example URI such as "content://com.example.android.pets/pets/3",
+                // For an example URI such as "content://com.example.android.inventory/inventory/3",
                 // the selection will be "_id=?" and the selection argument will be a
                 // String array containing the actual ID of 3 in this case.
                 //
@@ -75,7 +75,7 @@ public class InventoryProvider extends ContentProvider {
                 selection = InventoryContract.InventoryEntry._ID + "=?";
                 selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
 
-                // This will perform a query on the pets table where the _id equals 3 to return a
+                // This will perform a query on the inventory table where the _id equals 3 to return a
                 // Cursor containing that row of the table.
                 cursor = database.query(InventoryContract.InventoryEntry.TABLE_NAME, projection, selection, selectionArgs,
                         null, null, sortOrder);
@@ -101,17 +101,17 @@ public class InventoryProvider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
         switch (match) {
             case INVENTORY:
-                return insertPet(uri, contentValues);
+                return insertProduct(uri, contentValues);
             default:
                 throw new IllegalArgumentException("Insertion is not supported for " + uri);
         }
     }
 
     /**
-     * Insert a pet into the database with the given content values. Return the new content URI
+     * Insert a inventory into the database with the given content values. Return the new content URI
      * for that specific row in the database.
      */
-    private Uri insertPet(Uri uri, ContentValues values) {
+    private Uri insertProduct(Uri uri, ContentValues values) {
 
         // Check that the name is not null
         String name = values.getAsString(InventoryContract.InventoryEntry.COLUMN_PRODUCT_NAME);
@@ -137,7 +137,7 @@ public class InventoryProvider extends ContentProvider {
             return null;
         }
 
-        // Notify all listeners that the data has changed for the pet content URI
+        // Notify all listeners that the data has changed for the inventory content URI
         getContext().getContentResolver().notifyChange(uri, null);
 
 

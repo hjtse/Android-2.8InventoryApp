@@ -15,8 +15,8 @@ import com.example.android.inventory.data.InventoryContract.InventoryEntry;
 
 /**
  * {@link InventoryCursorAdapter} is an adapter for a list or grid view
- * that uses a {@link Cursor} of pet data as its data source. This adapter knows
- * how to create list items for each row of pet data in the {@link Cursor}.
+ * that uses a {@link Cursor} of inventory data as its data source. This adapter knows
+ * how to create list items for each row of inventory data in the {@link Cursor}.
  */
 public class InventoryCursorAdapter extends CursorAdapter {
 
@@ -46,8 +46,8 @@ public class InventoryCursorAdapter extends CursorAdapter {
     }
 
     /**
-     * This method binds the pet data (in the current row pointed to by cursor) to the given
-     * list item layout. For example, the name for the current pet can be set on the name TextView
+     * This method binds the inventory data (in the current row pointed to by cursor) to the given
+     * list item layout. For example, the name for the current inventory can be set on the name TextView
      * in the list item layout.
      *
      * @param view    Existing view, returned earlier by newView() method
@@ -61,23 +61,23 @@ public class InventoryCursorAdapter extends CursorAdapter {
         TextView nameTextView = (TextView) view.findViewById(R.id.name);
         TextView summaryTextView = (TextView) view.findViewById(R.id.summary);
 
-        // Find the columns of pet attributes that we're interested in
+        // Find the columns of inventory attributes that we're interested in
         int nameColumnIndex = cursor.getColumnIndex(InventoryContract.InventoryEntry.COLUMN_PRODUCT_NAME);
         int quantityColumnIndex = cursor.getColumnIndex(InventoryContract.InventoryEntry.COLUMN_QUANTITY);
 
-        // Read the pet attributes from the Cursor for the current pet
+        // Read the inventory attributes from the Cursor for the current inventory
         String inventoryName = cursor.getString(nameColumnIndex);
         String inventoryQuantity = cursor.getString(quantityColumnIndex);
 
 
-        // If the pet breed is empty string or null, then use some default text
+        // If the inventory breed is empty string or null, then use some default text
         // that says "Unknown breed", so the TextView isn't blank.
         if (TextUtils.isEmpty(inventoryQuantity)) {
             inventoryQuantity = context.getString(R.string.unknown_quantity);
         }
 
 
-        // Update the TextViews with the attributes for the current pet
+        // Update the TextViews with the attributes for the current inventory
         nameTextView.setText(inventoryName);
         summaryTextView.setText(inventoryQuantity);
     }
