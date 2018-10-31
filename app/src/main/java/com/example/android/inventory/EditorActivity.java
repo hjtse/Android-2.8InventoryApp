@@ -226,6 +226,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             return;
         }
 
+
         // Create a ContentValues object where column names are the keys, and product attributes are the values.
         ContentValues values = new ContentValues();
         values.put(InventoryEntry.COLUMN_PRODUCT_NAME, productString);
@@ -240,14 +241,16 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             // returning the content URI for the new inventory.
             Uri newUri = getContentResolver().insert(InventoryEntry.CONTENT_URI, values);
             // Show a toast message depending on whether or not the insertion was successful.
-            if (newUri == null) {
-                // If the new content URI is null, then there was an error with insertion.
-                Toast.makeText(this, getString(R.string.editor_insert_product_failed),
-                        Toast.LENGTH_SHORT).show();
-            } else {
-                // Otherwise, the insertion was successful and we can display a toast.
+            if (newUri != null && validateUserInputs()) {
+                //New content URI is not null and all user inputs validated. insertion was successful and we can display a toast.
                 Toast.makeText(this, getString(R.string.editor_insert_product_successful),
                         Toast.LENGTH_SHORT).show();
+
+            } else {
+                //Error with insertion.
+                Toast.makeText(this, getString(R.string.editor_insert_product_failed),
+                        Toast.LENGTH_SHORT).show();
+
             }
         } else {
             // Otherwise this is an EXISTING inventory, so update the inventory with content URI: mCurrentInventoryUri
@@ -256,13 +259,13 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             // we want to modify.
             int rowsAffected = getContentResolver().update(mCurrentInventoryUri, values, null, null);
             // Show a toast message depending on whether or not the update was successful.
-            if (rowsAffected == 0) {
-                // If no rows were affected, then there was an error with the update.
-                Toast.makeText(this, getString(R.string.editor_update_product_failed),
+            if (validateUserInputs() && rowsAffected > 0) {
+                //Rows were affected and all user inputs validated. Update successful and we can display a toast.
+                Toast.makeText(this, getString(R.string.editor_update_product_successful),
                         Toast.LENGTH_SHORT).show();
             } else {
-                // Otherwise, the update was successful and we can display a toast.
-                Toast.makeText(this, getString(R.string.editor_update_product_successful),
+                // Error with the update.
+                Toast.makeText(this, getString(R.string.editor_update_product_failed),
                         Toast.LENGTH_SHORT).show();
             }
         }
@@ -284,12 +287,23 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         switch (item.getItemId()) {
             // Respond to a click on the "Save" menu option
             case R.id.action_save:
+
+
                 // Save product to database
                 saveProduct();
                 //exit activity
-                finish();
-                return true;
-            // Respond to a click on the "Delete" menu option
+
+
+                if (validateUserInputs()) {
+
+                    finish();
+                    return true;
+                } else {
+                    return false;
+                }
+
+
+                // Respond to a click on the "Delete" menu option
             case R.id.action_delete:
                 // Pop up confirmation dialog for deletion
                 showDeleteConfirmationDialog();
@@ -393,13 +407,13 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             String name = cursor.getString(nameColumnIndex);
             String quantity = cursor.getString(quantityColumnIndex);
             int price = cursor.getInt(priceColumnIndex);
-            int supplierName = cursor.getInt(supplierColumnIndex);
+            String supplierName = cursor.getString(supplierColumnIndex);
             int supplierNumber = cursor.getInt(phoneColumnIndex);
 
             // Update the views on the screen with the values from the database
             mProductEditText.setText(name);
             mQuantityEditText.setText(quantity);
-            mSupplierEditText.setText(Integer.toString(supplierName));
+            mSupplierEditText.setText(supplierName);
             mPhoneEditText.setText(Integer.toString(supplierNumber));
 
             // Gender is a dropdown spinner, so map the constant value from the database
@@ -550,5 +564,25 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
         // Close the activity
         finish();
+    }
+
+    private boolean validateUserInputs() {
+
+
+        if (mProductEditText.getText().toString().trim().length() == 0) {
+            Toast.makeText(this, getString(R.string.validation_error_product), Toast.LENGTH_SHORT).show();
+            return false;
+        } else if (mQuantityEditText.getText().toString().length() == 0) {
+            Toast.makeText(this, getString(R.string.validation_error_quantity), Toast.LENGTH_SHORT).show();
+            return false;
+        } else if (mSupplierEditText.getText().toString().trim().length() == 0) {
+            Toast.makeText(this, getString(R.string.validation_error_supplier), Toast.LENGTH_SHORT).show();
+            return false;
+        } else if (mPhoneEditText.getText().toString().trim().length() == 0) {
+            Toast.makeText(this, getString(R.string.validation_error_phone), Toast.LENGTH_SHORT).show();
+            return false;
+        } else {
+            return true;
+        }
     }
 }
