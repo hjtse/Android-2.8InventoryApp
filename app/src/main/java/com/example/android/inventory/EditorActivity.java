@@ -19,6 +19,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -50,6 +51,11 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private EditText mSupplierEditText;
     private EditText mPhoneEditText;
     private Spinner mPriceSpinner;
+    private Button mIncrementQtyBtn;
+    private Button mDecrementQtyBtn;
+    private int item_qty = 0;
+
+
     /**
      * Price of the product. The possible valid values are in the InventoryContract.java file:
      * {@link InventoryEntry#PRICE_FREE}, {@link InventoryEntry#PRICE_CHEAP}, or
@@ -110,14 +116,32 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mSupplierEditText = (EditText) findViewById(R.id.edit_supplier_name);
         mPhoneEditText = (EditText) findViewById(R.id.edit_supplier_phone);
         mPriceSpinner = (Spinner) findViewById(R.id.spinner_price);
+        mIncrementQtyBtn = (Button) findViewById(R.id.increment_qty_btn_id);
+        mDecrementQtyBtn = (Button) findViewById(R.id.decrement_qty_btn_id);
 
         mProductEditText.setOnTouchListener(mTouchListener);
         mQuantityEditText.setOnTouchListener(mTouchListener);
         mSupplierEditText.setOnTouchListener(mTouchListener);
         mPhoneEditText.setOnTouchListener(mTouchListener);
         mPriceSpinner.setOnTouchListener(mTouchListener);
+        mIncrementQtyBtn.setOnTouchListener(mTouchListener);
+        mDecrementQtyBtn.setOnTouchListener(mTouchListener);
 
         setupSpinner();
+
+        mIncrementQtyBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mIncrementQty();
+
+            }
+        });
+        mDecrementQtyBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDecrementQty();
+            }
+        });
     }
 
     /**
@@ -157,6 +181,25 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 mPrice = InventoryEntry.PRICE_FREE;
             }
         });
+    }
+
+
+    private void mIncrementQty() {
+
+        item_qty = Integer.parseInt(mQuantityEditText.getText().toString());
+        item_qty = item_qty + 1;
+        mQuantityEditText.setText(Integer.toString(item_qty));
+
+    }
+
+    private void mDecrementQty() {
+
+        item_qty = Integer.parseInt(mQuantityEditText.getText().toString());
+        if (item_qty > 0) {
+            item_qty = item_qty - 1;
+        }
+        mQuantityEditText.setText(Integer.toString(item_qty));
+
     }
 
 
