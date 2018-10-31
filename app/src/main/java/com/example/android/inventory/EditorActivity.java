@@ -251,6 +251,13 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 // Pop up confirmation dialog for deletion
                 showDeleteConfirmationDialog();
                 return true;
+
+            // Respond to a click on the "Contact Vendor" menu option
+            case R.id.action_contact_vendor:
+                // Pop up confirmation dialog for contacting vendor
+                showContactVendorDialog();
+                return true;
+
             // Respond to a click on the "Up" arrow button in the app bar
             case android.R.id.home:
                 // If the inventory hasn't changed, continue with navigating up to parent activity
@@ -443,6 +450,36 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
+
+    private void showContactVendorDialog() {
+        //Dialog box of options to contact vendor
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.contact_dialog_msg);
+        builder.setPositiveButton(R.string.contact_dialog_phone, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked the "Call" button, so direct to phone app.
+                Intent intent = new Intent(Intent.ACTION_DIAL);
+                intent.setData(Uri.parse("tel:" + mPhoneEditText.getText().toString()));
+                startActivity(intent);
+            }
+
+        });
+
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked the "Cancel" button, so dismiss the dialog
+                // and continue editing the inventory.
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        // Create and show the AlertDialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
 
     /**
      * Perform the deletion of the inventory in the database.

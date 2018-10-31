@@ -8,6 +8,7 @@
     <string name="action_delete_all_entries">Delete All Products</string>
     <string name="action_save">Save</string>
     <string name="action_delete">Delete</string>
+    <string name="action_contactvendor">Contact Vendor</string>
 
 
     <string name="category_product">Product Name</string>
@@ -42,6 +43,13 @@
     <string name="delete">Delete</string>
     <string name="cancel">Cancel</string>
 
-    <string name="empty_view_title_text">It\'s a bit lonely here...</string>
+    <string name="contact_dialog_msg">Call vendor?</string>
+    <string name="contact_dialog_phone">Call</string>
+
+
+
+
+
+<string name="empty_view_title_text">It\'s a bit lonely here...</string>
     <string name="empty_view_subtitle_text">Get started by adding a product</string>
 </resources>
