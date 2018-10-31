@@ -1,4 +1,4 @@
-package com.example.android.inventory.data;
+package com.example.android.inventory;
 
 public class Product {
 

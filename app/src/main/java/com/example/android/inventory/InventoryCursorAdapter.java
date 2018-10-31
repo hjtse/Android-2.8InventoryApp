@@ -1,11 +1,14 @@
 package com.example.android.inventory;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.android.inventory.data.InventoryContract;
@@ -54,38 +57,50 @@ public class InventoryCursorAdapter extends CursorAdapter {
      *                correct row.
      */
     @Override
-    public void bindView(View view, Context context, Cursor cursor) {
+    public void bindView(View view, final Context context, Cursor cursor) {
         // Find individual views that we want to modify in the list item layout
         TextView nameTextView = (TextView) view.findViewById(R.id.product_id);
         TextView quantityTextView = (TextView) view.findViewById(R.id.quantity_id);
         TextView priceTextView = (TextView) view.findViewById(R.id.price_id);
+        ImageButton saleButton = (ImageButton) view.findViewById(R.id.sale_buttom_id);
 
 
         // Find the columns of inventory attributes that we're interested in
         int _id = cursor.getInt(cursor.getColumnIndexOrThrow(InventoryContract.InventoryEntry._ID));
-//        String nameColumnIndex = cursor.getString(cursor.getColumnIndexOrThrow(InventoryContract.InventoryEntry.COLUMN_PRODUCT_NAME));
-//        String quantityColumnIndex = cursor.getString(cursor.getColumnIndexOrThrow(InventoryContract.InventoryEntry.COLUMN_QUANTITY));
-//        String priceColumnIndex = cursor.getString(cursor.getColumnIndexOrThrow(InventoryContract.InventoryEntry.COLUMN_PRICE));
-        int nameColumnIndex = cursor.getColumnIndex(InventoryContract.InventoryEntry.COLUMN_PRODUCT_NAME);
-        int quantityColumnIndex = cursor.getColumnIndex(InventoryContract.InventoryEntry.COLUMN_QUANTITY);
-        int priceColumnIndex = cursor.getColumnIndex(InventoryContract.InventoryEntry.COLUMN_PRICE);
+        String nameColumnIndex = cursor.getString(cursor.getColumnIndexOrThrow(InventoryContract.InventoryEntry.COLUMN_PRODUCT_NAME));
+        int quantityColumnIndex = cursor.getInt(cursor.getColumnIndexOrThrow(InventoryContract.InventoryEntry.COLUMN_QUANTITY));
+        int priceColumnIndex = cursor.getInt(cursor.getColumnIndexOrThrow(InventoryContract.InventoryEntry.COLUMN_PRICE));
 
         // Read the inventory attributes from the Cursor for the current inventory
-        String productName = cursor.getString(nameColumnIndex);
-        String productQuantity = cursor.getString(quantityColumnIndex);
-        String productPrice = cursor.getString(priceColumnIndex);
+//        String productName = cursor.getString(nameColumnIndex);
+//        String productQuantity = cursor.getString(quantityColumnIndex);
+//        String productPrice = cursor.getString(priceColumnIndex);
 
         // Update the TextViews with the attributes for the current inventory
-        nameTextView.setText(productName);
-        quantityTextView.setText(productQuantity);
-        priceTextView.setText(productPrice);
+        nameTextView.setText(nameColumnIndex);
+        quantityTextView.setText(Integer.toString(quantityColumnIndex));
+        priceTextView.setText(Integer.toString(priceColumnIndex));
 
+        Product productObj = new Product(_id, quantityColumnIndex);
+        saleButton.setTag(productObj);
 
-        // If the inventory breed is empty string or null, then use some default text
-        // that says "Unknown breed", so the TextView isn't blank.
-//        if (TextUtils.isEmpty(inventoryQuantity)) {
-//            inventoryQuantity = context.getString(R.string.unknown_quantity);
-//        }
+        saleButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Product obj = (Product) v.getTag();
+                String selection = InventoryContract.InventoryEntry._ID + "= ?";
+                String[] selectionArgs = {Integer.toString(obj.getmProductId())};
+                Uri updateURI = Uri.withAppendedPath(InventoryContract.InventoryEntry.CONTENT_URI, Integer.toString(obj.getmProductId()));
+                if (obj.getmProductQuantity() > 0) {
+                    ContentValues values = new ContentValues();
+                    values.put(InventoryContract.InventoryEntry.COLUMN_QUANTITY, obj.getmProductQuantity() - 1);
+                    int count = context.getContentResolver().update(updateURI, values, selection, selectionArgs);
+                }
+
+            }
+        });
+
 
     }
 }
