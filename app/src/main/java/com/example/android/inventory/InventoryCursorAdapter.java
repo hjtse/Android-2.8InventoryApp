@@ -71,11 +71,6 @@ public class InventoryCursorAdapter extends CursorAdapter {
         int quantityColumnIndex = cursor.getInt(cursor.getColumnIndexOrThrow(InventoryContract.InventoryEntry.COLUMN_QUANTITY));
         int priceColumnIndex = cursor.getInt(cursor.getColumnIndexOrThrow(InventoryContract.InventoryEntry.COLUMN_PRICE));
 
-        // Read the inventory attributes from the Cursor for the current inventory
-//        String productName = cursor.getString(nameColumnIndex);
-//        String productQuantity = cursor.getString(quantityColumnIndex);
-//        String productPrice = cursor.getString(priceColumnIndex);
-
         // Update the TextViews with the attributes for the current inventory
         nameTextView.setText(nameColumnIndex);
         quantityTextView.setText(Integer.toString(quantityColumnIndex));

@@ -88,7 +88,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         ContentValues values = new ContentValues();
         values.put(InventoryContract.InventoryEntry.COLUMN_PRODUCT_NAME, "PRODUCT");
         values.put(InventoryContract.InventoryEntry.COLUMN_QUANTITY, "123");
-        values.put(InventoryContract.InventoryEntry.COLUMN_PRICE, InventoryContract.InventoryEntry.PRICE_CHEAP);
+        values.put(InventoryContract.InventoryEntry.COLUMN_PRICE, "99");
         values.put(InventoryContract.InventoryEntry.COLUMN_SUPPLIER_NAME, "SUPPLIER");
         values.put(InventoryContract.InventoryEntry.COLUMN_SUPPLIER_PHONE, 1234567890);
 

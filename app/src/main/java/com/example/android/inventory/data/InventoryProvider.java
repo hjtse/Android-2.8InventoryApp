@@ -58,25 +58,11 @@ public class InventoryProvider extends ContentProvider {
         int match = sUriMatcher.match(uri);
         switch (match) {
             case INVENTORY:
-                // For the INVENTORY code, query the inventory table directly with the given
-                // projection, selection, selection arguments, and sort order. The cursor
-                // could contain multiple rows of the inventory table.
                 cursor = database.query(InventoryContract.InventoryEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
                 break;
             case INVENTORY_ID:
-                // For the INVENTORY_ID code, extract out the ID from the URI.
-                // For an example URI such as "content://com.example.android.inventory/inventory/3",
-                // the selection will be "_id=?" and the selection argument will be a
-                // String array containing the actual ID of 3 in this case.
-                //
-                // For every "?" in the selection, we need to have an element in the selection
-                // arguments that will fill in the "?". Since we have 1 question mark in the
-                // selection, we have 1 String in the selection arguments' String array.
                 selection = InventoryContract.InventoryEntry._ID + "=?";
                 selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
-
-                // This will perform a query on the inventory table where the _id equals 3 to return a
-                // Cursor containing that row of the table.
                 cursor = database.query(InventoryContract.InventoryEntry.TABLE_NAME, projection, selection, selectionArgs,
                         null, null, sortOrder);
                 break;
@@ -84,9 +70,6 @@ public class InventoryProvider extends ContentProvider {
                 throw new IllegalArgumentException("Cannot query unknown URI " + uri);
         }
 
-        // Set notification URI on the Cursor,
-        // so we know what content URI the Cursor was created for.
-        // If the data at this URI changes, then we know we need to update the Cursor.
         cursor.setNotificationUri(getContext().getContentResolver(), uri);
 
         return cursor;
@@ -120,7 +103,7 @@ public class InventoryProvider extends ContentProvider {
         }
 
         Integer price = values.getAsInteger(InventoryContract.InventoryEntry.COLUMN_PRICE);
-        if (price == null || !InventoryContract.InventoryEntry.isValidPrice(price)) {
+        if (price == null || price < 0) {
             throw new IllegalArgumentException("Product requires valid price");
         }
 
@@ -177,7 +160,7 @@ public class InventoryProvider extends ContentProvider {
 
         if (values.containsKey(InventoryEntry.COLUMN_PRICE)) {
             Integer price = values.getAsInteger(InventoryContract.InventoryEntry.COLUMN_PRICE);
-            if (price == null || !InventoryContract.InventoryEntry.isValidPrice(price)) {
+            if (price == null || price < 0) {
                 throw new IllegalArgumentException("Product requires valid price");
             }
         }

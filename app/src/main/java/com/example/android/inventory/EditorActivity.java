@@ -50,18 +50,10 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private EditText mQuantityEditText;
     private EditText mSupplierEditText;
     private EditText mPhoneEditText;
-    private Spinner mPriceSpinner;
+    private EditText mPriceEditText;
     private Button mIncrementQtyBtn;
     private Button mDecrementQtyBtn;
     private int item_qty = 0;
-
-
-    /**
-     * Price of the product. The possible valid values are in the InventoryContract.java file:
-     * {@link InventoryEntry#PRICE_FREE}, {@link InventoryEntry#PRICE_CHEAP}, or
-     * {@link InventoryEntry#PRICE_EXPENSIVE}.
-     */
-    private int mPrice = InventoryEntry.PRICE_FREE;
 
     /**
      * Boolean flag that keeps track of whether the inventory has been edited (true) or not (false)
@@ -115,7 +107,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mQuantityEditText = (EditText) findViewById(R.id.edit_product_quantity);
         mSupplierEditText = (EditText) findViewById(R.id.edit_supplier_name);
         mPhoneEditText = (EditText) findViewById(R.id.edit_supplier_phone);
-        mPriceSpinner = (Spinner) findViewById(R.id.spinner_price);
+        mPriceEditText = (EditText) findViewById(R.id.edit_price);
         mIncrementQtyBtn = (Button) findViewById(R.id.increment_qty_btn_id);
         mDecrementQtyBtn = (Button) findViewById(R.id.decrement_qty_btn_id);
 
@@ -123,11 +115,9 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mQuantityEditText.setOnTouchListener(mTouchListener);
         mSupplierEditText.setOnTouchListener(mTouchListener);
         mPhoneEditText.setOnTouchListener(mTouchListener);
-        mPriceSpinner.setOnTouchListener(mTouchListener);
+        mPriceEditText.setOnTouchListener(mTouchListener);
         mIncrementQtyBtn.setOnTouchListener(mTouchListener);
         mDecrementQtyBtn.setOnTouchListener(mTouchListener);
-
-        setupSpinner();
 
         mIncrementQtyBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -143,46 +133,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             }
         });
     }
-
-    /**
-     * Setup the dropdown spinner that allows the user to select the price of the product.
-     */
-    private void setupSpinner() {
-        // Create adapter for spinner. The list options are from the String array it will use
-        // the spinner will use the default layout
-        ArrayAdapter priceSpinnerAdapter = ArrayAdapter.createFromResource(this,
-                R.array.array_price_options, android.R.layout.simple_spinner_item);
-
-        // Specify dropdown layout style - simple list view with 1 item per line
-        priceSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
-
-        // Apply the adapter to the spinner
-        mPriceSpinner.setAdapter(priceSpinnerAdapter);
-
-        // Set the integer mSelected to the constant values
-        mPriceSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selection = (String) parent.getItemAtPosition(position);
-                if (!TextUtils.isEmpty(selection)) {
-                    if (selection.equals(getString(R.string.price_cheap))) {
-                        mPrice = InventoryEntry.PRICE_CHEAP; // Male
-                    } else if (selection.equals(getString(R.string.price_expensive))) {
-                        mPrice = InventoryContract.InventoryEntry.PRICE_EXPENSIVE; // Female
-                    } else {
-                        mPrice = InventoryEntry.PRICE_FREE; // Unknown
-                    }
-                }
-            }
-
-            // Because AdapterView is an abstract class, onNothingSelected must be defined
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                mPrice = InventoryEntry.PRICE_FREE;
-            }
-        });
-    }
-
 
     private void mIncrementQty() {
 
@@ -213,6 +163,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         String quantityString = mQuantityEditText.getText().toString().trim();
         String supplierString = mSupplierEditText.getText().toString().trim();
         String phoneString = mPhoneEditText.getText().toString().trim();
+        String priceString = mPriceEditText.getText().toString().trim();
 
         // Check if this is supposed to be a new inventory and check if all the fields in the editor are blank
         if (mCurrentInventoryUri == null &&
@@ -220,7 +171,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 TextUtils.isEmpty(quantityString) &&
                 TextUtils.isEmpty(supplierString) &&
                 TextUtils.isEmpty(phoneString) &&
-                mPrice == InventoryEntry.PRICE_FREE) {
+                TextUtils.isEmpty(priceString)) {
             // Since no fields were modified, we can return early without creating a new inventory.
             // No need to create ContentValues and no need to do any ContentProvider operations.
             return;
@@ -233,7 +184,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         values.put(InventoryEntry.COLUMN_QUANTITY, quantityString);
         values.put(InventoryEntry.COLUMN_SUPPLIER_NAME, supplierString);
         values.put(InventoryEntry.COLUMN_SUPPLIER_PHONE, phoneString);
-        values.put(InventoryEntry.COLUMN_PRICE, mPrice);
+        values.put(InventoryEntry.COLUMN_PRICE, priceString);
 
         // Determine if this is a new or existing inventory by checking if mCurrentInventoryUri is null or not
         if (mCurrentInventoryUri == null) {
@@ -288,22 +239,16 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             // Respond to a click on the "Save" menu option
             case R.id.action_save:
 
-
-                // Save product to database
-                saveProduct();
-                //exit activity
-
-
                 if (validateUserInputs()) {
-
+                    saveProduct();
                     finish();
-                    return true;
                 } else {
-                    return false;
+                    validateUserInputs();
                 }
+                return true;
 
 
-                // Respond to a click on the "Delete" menu option
+            // Respond to a click on the "Delete" menu option
             case R.id.action_delete:
                 // Pop up confirmation dialog for deletion
                 showDeleteConfirmationDialog();
@@ -415,21 +360,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             mQuantityEditText.setText(quantity);
             mSupplierEditText.setText(supplierName);
             mPhoneEditText.setText(Integer.toString(supplierNumber));
+            mPriceEditText.setText(Integer.toString(price));
 
-            // Gender is a dropdown spinner, so map the constant value from the database
-            // into one of the dropdown options (0 is Unknown, 1 is Male, 2 is Female).
-            // Then call setSelection() so that option is displayed on screen as the current selection.
-            switch (price) {
-                case InventoryEntry.PRICE_CHEAP:
-                    mPriceSpinner.setSelection(1);
-                    break;
-                case InventoryEntry.PRICE_EXPENSIVE:
-                    mPriceSpinner.setSelection(2);
-                    break;
-                default:
-                    mPriceSpinner.setSelection(0);
-                    break;
-            }
         }
     }
 
@@ -439,7 +371,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mProductEditText.setText("");
         mQuantityEditText.setText("");
         mSupplierEditText.setText("");
-        mPriceSpinner.setSelection(0); // Select "Unknown" gender
+        mPriceEditText.setText("");
         mPhoneEditText.setText("");
     }
 
@@ -574,6 +506,9 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             return false;
         } else if (mQuantityEditText.getText().toString().length() == 0) {
             Toast.makeText(this, getString(R.string.validation_error_quantity), Toast.LENGTH_SHORT).show();
+            return false;
+        } else if (mPriceEditText.getText().toString().length() == 0) {
+            Toast.makeText(this, getString(R.string.validation_error_price), Toast.LENGTH_SHORT).show();
             return false;
         } else if (mSupplierEditText.getText().toString().trim().length() == 0) {
             Toast.makeText(this, getString(R.string.validation_error_supplier), Toast.LENGTH_SHORT).show();

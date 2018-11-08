@@ -22,6 +22,7 @@
     <string name="hint_product_quantity">Quantity</string>
     <string name="hint_supplier_name">Supplier</string>
     <string name="hint_supplier_phone">Phone</string>
+    <string name="hint_product_price">Price</string>
     <string name="unknown_quantity">Unknown quantity</string>
 
     <string name="price_free">$</string>
@@ -37,6 +38,7 @@
     <string name="validation_error_product">Enter Valid Product Name</string>
     <string name="validation_error_quantity">Enter Valid Quantity</string>
     <string name="validation_error_supplier">Enter Valid Supplier Name</string>
+    <string name="validation_error_price">Enter Valid Price</string>
     <string name="validation_error_phone">Enter Valid Phone Number</string>
 
 

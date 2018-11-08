@@ -44,17 +44,5 @@ public final class InventoryContract {
         public static final String COLUMN_SUPPLIER_NAME = "supplier";
         public static final String COLUMN_SUPPLIER_PHONE = "phone";
 
-        public static final int PRICE_FREE = 0;
-        public static final int PRICE_CHEAP = 1;
-        public static final int PRICE_EXPENSIVE = 2;
-
-        public static boolean isValidPrice(int price) {
-            if (price == PRICE_FREE || price == PRICE_CHEAP || price == PRICE_EXPENSIVE) {
-                return true;
-            }
-            return false;
-
-
-        }
     }
 }
